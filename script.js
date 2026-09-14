@@ -1,199 +1,273 @@
-const surprises = [
-  "🎄 Ein heißer Kakao wärmt heute die Seele!",
-  "⭐ Glaube an Wunder, Liebe und Glück.",
-  "🕯️ Zünde heute eine Kerze für Gemütlichkeit an.",
-  "🍪 Zeit, Plätzchen zu naschen oder zu backen!",
-  "❄️ Atme tief ein und genieße die Winterluft.",
-  "🎅 Frohen Nikolaustag! Schau in deine Schuhe.",
-  "🎶 Höre heute dein liebstes Weihnachtslied.",
-  "🎁 Schicke jemandem eine nette Sprachnachricht.",
-  "📖 Gönne dir heute 15 Minuten Lesezeit.",
-  "🍵 Genieße einen wärmenden Gewürztee.",
-  "✨ Schenke heute einem Fremden ein Lächeln.",
-  "🍊 Duft von Zimt und Mandarinen genießen.",
-  "💌 Zeit für die ersten Weihnachtsgrüße.",
-  "🌟 Schau heute Abend kurz in den Sternenhimmel.",
-  "🎬 Zeit für einen gemütlichen Weihnachtsfilm.",
-  "🥨 Gönne dir heute eine süße Leckerei.",
-  "🧣 Kuschel dich warm ein.",
-  "🌨️ Nimm dir heute eine kleine Auszeit.",
-  "🕯️ Das Fest rückt immer näher!",
-  "🎉 Erinnere dich an einen schönen Moment des Jahres.",
-  "🕊️ Ruhe und Gelassenheit für den Tag.",
-  "🎵 Mach die Weihnachtsmusik an!",
-  "🌲 Morgen ist Heiligabend!",
-  "🎅 Frohe und gesegnete Weihnachten!"
-];
+// State-Management
+let currentDate = new Date();
+let selectedDateString = new Date().toISOString().split('T')[0];
+let selectedEventId = null;
 
-const calendar = document.getElementById("calendar");
-const testModeCheckbox = document.getElementById("test-mode");
-const resetBtn = document.getElementById("reset-btn");
-const modalOverlay = document.getElementById("modal-overlay");
-const modalBadge = document.getElementById("modal-day-badge");
-const modalContent = document.getElementById("modal-content");
-const modalClose = document.getElementById("modal-close");
+// Standard-Beispieldaten mit den neuen Kategorien
+const initialEvents = [];
 
-let openedDoors = JSON.parse(localStorage.getItem("advent_opened_doors")) || [];
+let events = JSON.parse(localStorage.getItem('my_calendar_events')) || initialEvents;
 
-// Array mischen
-function shuffle(array) {
-  const arr = [...array];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
+// Mapping der Schlüssel zu den Anzeige-Namen
+const categoryNames = {
+  pferd: '🐎 Pferd',
+  tage: '👸 Tage',
+  uni: '🏫 Uni',
+  arbeit: '💼 Arbeit'
+};
+
+// DOM-Elemente
+const calendarDays = document.getElementById('calendarDays');
+const currentMonthYear = document.getElementById('currentMonthYear');
+const createModal = document.getElementById('createModal');
+const detailModal = document.getElementById('detailModal');
+const createEventForm = document.getElementById('createEventForm');
+const agendaList = document.getElementById('agendaList');
+const agendaDateTitle = document.getElementById('agendaDateTitle');
+
+// Aktive Kategorien ermitteln
+function getActiveCategories() {
+  const active = [];
+  document.querySelectorAll('.filter-section input[type="checkbox"]').forEach(cb => {
+    if (cb.checked) active.push(cb.value);
+  });
+  return active;
 }
 
-// 24 überlappungsfreie Zonen mit Zufallsversatz (Jitter) berechnen
-function generateRandomLayout() {
-  const rows = 6;
-  const cols = 4;
-  const positions = [];
+// Tages-Agenda (Mobile) chronologisch sortiert rendern
+function renderAgenda() {
+  const agendaSection = document.getElementById('agendaSection');
+  const activeCategories = getActiveCategories();
+  
+  // 1. Filtern und 2. Chronologisch nach Uhrzeit sortieren
+  const dayEvents = events
+    .filter(ev => ev.date === selectedDateString && activeCategories.includes(ev.category))
+    .sort((a, b) => (a.time || '').localeCompare(b.time || ''));
 
-  const days = shuffle(Array.from({ length: 24 }, (_, i) => i + 1));
-  let index = 0;
-
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const day = days[index++];
-
-      // Basispositionen in Prozent der Zelle
-      const cellTop = (r / rows) * 100;
-      const cellLeft = (c / cols) * 100;
-
-      // Zufallsversatz innerhalb der Zelle
-      const jitterTop = (Math.random() * 4) + 1; // 1% bis 5%
-      const jitterLeft = (Math.random() * 6) + 2; // 2% bis 8%
-      const rotation = (Math.random() * 20) - 10; // -10deg bis +10deg
-
-      positions.push({
-        day: day,
-        top: cellTop + jitterTop,
-        left: cellLeft + jitterLeft,
-        rotate: rotation
-      });
-    }
+  // Wenn keine Termine vorhanden sind -> Bereich komplett ausblenden
+  if (dayEvents.length === 0) {
+    agendaSection.style.display = 'none';
+    agendaList.innerHTML = '';
+    return;
   }
 
-  localStorage.setItem("advent_positions", JSON.stringify(positions));
-  return positions;
-}
+  // Wenn Termine vorhanden sind -> Einblenden und auflisten
+  agendaSection.style.display = 'block';
 
-function getPositions() {
-  let saved = JSON.parse(localStorage.getItem("advent_positions"));
-  if (!saved || saved.length !== 24) {
-    saved = generateRandomLayout();
-  }
-  return saved;
-}
+  const [y, m, d] = selectedDateString.split('-');
+  const formattedDate = new Date(y, m - 1, d).toLocaleDateString('de-DE', { 
+    weekday: 'short', 
+    day: '2-digit', 
+    month: '2-digit', 
+    year: 'numeric' 
+  });
+  agendaDateTitle.textContent = `Termine am ${formattedDate}`;
 
-function triggerHaptic() {
-  if ("vibrate" in navigator) {
-    navigator.vibrate(20);
-  }
-}
-
-function openModal(day) {
-  modalBadge.textContent = `Türchen ${day}`;
-  modalContent.textContent = surprises[day - 1];
-  modalOverlay.style.display = "flex";
-  document.body.classList.add("modal-open");
-}
-
-function closeModal() {
-  modalOverlay.style.display = "none";
-  document.body.classList.remove("modal-open");
-}
-
-function createCalendar() {
-  calendar.innerHTML = "";
-  const today = new Date();
-  const currentMonth = today.getMonth(); // 11 = Dezember
-  const currentDay = today.getDate();
-  const positions = getPositions();
-
-  positions.forEach(item => {
-    const { day, top, left, rotate } = item;
-
-    const container = document.createElement("div");
-    container.className = "door-container";
-    container.style.top = `${top}%`;
-    container.style.left = `${left}%`;
-    container.style.transform = `rotate(${rotate}deg)`;
-
-    const card = document.createElement("div");
-    card.className = "door-card";
-    
-    if (openedDoors.includes(day)) {
-      card.classList.add("open");
-    }
-
-    const front = document.createElement("div");
-    front.className = "door-front";
-    front.innerHTML = `<span class="number">${day}</span><span class="star">★</span>`;
-
-    const back = document.createElement("div");
-    back.className = "door-back";
-    back.innerHTML = `<span>✓</span>`;
-
-    card.appendChild(front);
-    card.appendChild(back);
-    container.appendChild(card);
-
-    container.addEventListener("click", () => {
-      triggerHaptic();
-      const isDecember = currentMonth === 11;
-      const isAllowed = testModeCheckbox.checked || (isDecember && currentDay >= day);
-
-      if (!isAllowed) {
-        alert(`Türchen ${day} öffnet sich erst am ${day}. Dezember! 🎅`);
-        return;
-      }
-
-      if (!openedDoors.includes(day)) {
-        openedDoors.push(day);
-        localStorage.setItem("advent_opened_doors", JSON.stringify(openedDoors));
-        card.classList.add("open");
-      }
-
-      setTimeout(() => openModal(day), 250);
-    });
-
-    calendar.appendChild(container);
+  agendaList.innerHTML = '';
+  dayEvents.forEach(ev => {
+    const item = document.createElement('div');
+    item.className = `agenda-item cat-${ev.category}`;
+    item.innerHTML = `
+      <div>
+        <strong>${ev.title}</strong>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+          ${ev.time ? '⏰ ' + ev.time + ' · ' : ''}${categoryNames[ev.category] || ev.category}
+        </div>
+      </div>
+      <span style="font-size: 1.2rem; color: var(--text-muted);">&rsaquo;</span>
+    `;
+    item.addEventListener('click', () => openDetailModal(ev.id));
+    agendaList.appendChild(item);
   });
 }
 
-modalClose.addEventListener("click", closeModal);
-modalOverlay.addEventListener("click", (e) => {
-  if (e.target === modalOverlay) closeModal();
-});
+// Kalender-Monatsraster rendern (ebenfalls sortiert)
+function renderCalendar() {
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
 
-resetBtn.addEventListener("click", () => {
-  if (confirm("Kalender zurücksetzen und Türchen neu im Bild verteilen?")) {
-    openedDoors = [];
-    localStorage.removeItem("advent_opened_doors");
-    localStorage.removeItem("advent_positions");
-    createCalendar();
+  const monthName = currentDate.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+  currentMonthYear.textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
+  calendarDays.innerHTML = '';
+
+  const firstDay = new Date(year, month, 1);
+  let startingDay = firstDay.getDay() - 1; // Montag = 0
+  if (startingDay === -1) startingDay = 6;
+
+  const lastDay = new Date(year, month + 1, 0);
+  const totalDays = lastDay.getDate();
+  const prevMonthLastDay = new Date(year, month, 0).getDate();
+
+  // Tage des Vormonats
+  for (let i = startingDay; i > 0; i--) {
+    const dayCell = document.createElement('div');
+    dayCell.className = 'day-cell other-month';
+    dayCell.innerHTML = `<span class="day-number">${prevMonthLastDay - i + 1}</span>`;
+    calendarDays.appendChild(dayCell);
   }
-});
 
-// Schneefall
-function createSnow() {
-  const snowContainer = document.getElementById("snow-container");
-  const flakeCount = 18;
+  const activeCategories = getActiveCategories();
+  const today = new Date();
 
-  for (let i = 0; i < flakeCount; i++) {
-    const flake = document.createElement("div");
-    flake.className = "snowflake";
-    flake.textContent = "•";
-    flake.style.left = Math.random() * 100 + "vw";
-    flake.style.animationDuration = Math.random() * 3 + 3 + "s";
-    flake.style.opacity = Math.random() * 0.5 + 0.3;
-    flake.style.fontSize = Math.random() * 12 + 10 + "px";
-    snowContainer.appendChild(flake);
+  // Tage des aktuellen Monats
+  for (let day = 1; day <= totalDays; day++) {
+    const dayCell = document.createElement('div');
+    dayCell.className = 'day-cell';
+
+    const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+    if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+      dayCell.classList.add('today');
+    }
+
+    if (dateString === selectedDateString) {
+      dayCell.classList.add('selected-day');
+    }
+
+    dayCell.innerHTML = `<span class="day-number">${day}</span>`;
+
+    // Termine filtern und chronologisch sortieren
+    const dayEvents = events
+      .filter(ev => ev.date === dateString && activeCategories.includes(ev.category))
+      .sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+
+    // Desktop: Text-Badges
+    dayEvents.forEach(ev => {
+      const badge = document.createElement('div');
+      badge.className = `event-badge cat-${ev.category}`;
+      badge.textContent = (ev.time ? ev.time + ' ' : '') + ev.title;
+      badge.title = ev.title;
+      badge.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openDetailModal(ev.id);
+      });
+      dayCell.appendChild(badge);
+    });
+
+    // Mobile: Farbpunkte (Dots)
+    if (dayEvents.length > 0) {
+      const dotsContainer = document.createElement('div');
+      dotsContainer.className = 'event-dots-container';
+      dayEvents.slice(0, 4).forEach(ev => {
+        const dot = document.createElement('div');
+        dot.className = `event-dot bg-cat-${ev.category}`;
+        dotsContainer.appendChild(dot);
+      });
+      dayCell.appendChild(dotsContainer);
+    }
+
+    // Klick auf Tag
+    dayCell.addEventListener('click', () => {
+      selectedDateString = dateString;
+      document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected-day'));
+      dayCell.classList.add('selected-day');
+      renderAgenda();
+    });
+
+    calendarDays.appendChild(dayCell);
   }
+
+  // Raster auffüllen
+  const totalRendered = startingDay + totalDays;
+  const remainingDays = 42 - totalRendered;
+  if (remainingDays < 7) {
+    for (let i = 1; i <= remainingDays; i++) {
+      const dayCell = document.createElement('div');
+      dayCell.className = 'day-cell other-month';
+      dayCell.innerHTML = `<span class="day-number">${i}</span>`;
+      calendarDays.appendChild(dayCell);
+    }
+  }
+
+  renderAgenda();
 }
 
-createSnow();
-createCalendar();
+
+// Modal-Logik
+function openDetailModal(id) {
+  selectedEventId = id;
+  const ev = events.find(e => e.id === id);
+  if (!ev) return;
+
+  document.getElementById('detailTitle').textContent = ev.title;
+  document.getElementById('detailDate').textContent = ev.date;
+  document.getElementById('detailTime').textContent = ev.time || 'Keine Angabe';
+  document.getElementById('detailCategory').textContent = categoryNames[ev.category] || ev.category;
+  document.getElementById('detailNotes').textContent = ev.notes || 'Keine Notiz vorhanden';
+
+  detailModal.classList.add('active');
+}
+
+function closeDetailModal() {
+  detailModal.classList.remove('active');
+  selectedEventId = null;
+}
+
+function openCreateModal(defaultDate) {
+  createEventForm.reset();
+  document.getElementById('eventDate').value = defaultDate || selectedDateString || new Date().toISOString().split('T')[0];
+  createModal.classList.add('active');
+}
+
+// Navigation Event-Listener
+document.getElementById('btnPrev').addEventListener('click', () => {
+  currentDate.setMonth(currentDate.getMonth() - 1);
+  renderCalendar();
+});
+
+document.getElementById('btnNext').addEventListener('click', () => {
+  currentDate.setMonth(currentDate.getMonth() + 1);
+  renderCalendar();
+});
+
+document.getElementById('btnToday').addEventListener('click', () => {
+  currentDate = new Date();
+  selectedDateString = new Date().toISOString().split('T')[0];
+  renderCalendar();
+});
+
+// Filter-Checkboxen Event-Listener
+document.querySelectorAll('.category-filter').forEach(label => {
+  label.addEventListener('click', () => {
+    const checkbox = label.querySelector('input');
+    label.classList.toggle('inactive', !checkbox.checked);
+    renderCalendar();
+  });
+});
+
+// Erstellen & Löschen
+document.getElementById('btnOpenCreateModal').addEventListener('click', () => openCreateModal());
+document.getElementById('btnCancelCreate').addEventListener('click', () => createModal.classList.remove('active'));
+
+createEventForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const newEvent = {
+    id: Date.now().toString(),
+    title: document.getElementById('eventTitle').value.trim(),
+    date: document.getElementById('eventDate').value,
+    time: document.getElementById('eventTime').value,
+    category: document.getElementById('eventCategory').value,
+    notes: document.getElementById('eventNotes').value.trim()
+  };
+
+  events.push(newEvent);
+  localStorage.setItem('my_calendar_events', JSON.stringify(events));
+  selectedDateString = newEvent.date;
+  createModal.classList.remove('active');
+  renderCalendar();
+});
+
+document.getElementById('btnDeleteEvent').addEventListener('click', () => {
+  if (!selectedEventId) return;
+  events = events.filter(e => e.id !== selectedEventId);
+  localStorage.setItem('my_calendar_events', JSON.stringify(events));
+  closeDetailModal();
+  renderCalendar();
+});
+
+document.getElementById('btnCloseDetail').addEventListener('click', closeDetailModal);
+
+// Initialer Aufruf
+renderCalendar();
+
