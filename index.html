@@ -2,124 +2,54 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kalender</title>
-  <!-- CSS einbinden -->
-  <link rel="stylesheet" href="style.css">
-  <link rel="apple-touch-icon" href="icon.png">
-  <link rel="icon" type="image/png" href="icon.png">
+  <!-- viewport-fit=cover nutzt das gesamte Display inklusive Notch & Home-Bar -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <!-- Browser-Leisten & Statusbar-Farben -->
+  <meta name="theme-color" content="#0b1d3a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#ffffff">
+
+  <title>Adventskalender</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div class="calendar-container">
-    <!-- Header -->
-    <div class="calendar-header">
-      <h2 id="currentMonthYear">Monat Jahr</h2>
-      <div class="nav-buttons">
-        <button class="btn" id="btnPrev">&lt; Zurück</button>
-        <button class="btn" id="btnToday">Heute</button>
-        <button class="btn" id="btnNext">Weiter &gt;</button>
-        <button class="btn btn-primary" id="btnOpenCreateModal">+ Neu</button>
-      </div>
-    </div>
+  <!-- Fixierte Hintergrundschicht (verhindert weiße Ränder beim Scrollen/Bouncen) -->
+  <div class="bg-layer"></div>
 
-    <!-- Multi-Kategorie-Filter -->
-    <div class="filter-section">
-      <label class="category-filter cat-pferd" data-cat="pferd">
-        <input type="checkbox" checked value="pferd"> 🐎 Pferd
-      </label>
-      <label class="category-filter cat-tage" data-cat="tage">
-        <input type="checkbox" checked value="tage"> 👸 Tage
-      </label>
-      <label class="category-filter cat-uni" data-cat="uni">
-        <input type="checkbox" checked value="uni"> 🏫 Uni
-      </label>
-      <label class="category-filter cat-arbeit" data-cat="arbeit">
-        <input type="checkbox" checked value="arbeit"> 💼 Arbeit
-      </label>
-    </div>
+  <!-- Schneefall -->
+  <div id="snow-container"></div>
 
-    <!-- Wochentage -->
-    <div class="weekdays-grid">
-      <div>Mo</div><div>Di</div><div>Mi</div><div>Do</div><div>Fr</div><div>Sa</div><div>So</div>
-    </div>
+  <div class="app-wrapper">
+    <header>
+      <h1>✨ Adventskalender ✨</h1>
+      <p>Finde und öffne das heutige Türchen</p>
+    </header>
 
-    <!-- Kalendertage -->
-    <div class="days-grid" id="calendarDays"></div>
+    <!-- Freier Bereich für verstreute Türchen -->
+    <main class="calendar-canvas" id="calendar"></main>
 
-    <!-- Mobile Tages-Agenda (ohne doppelten Button) -->
-    <div class="day-agenda-section" id="agendaSection" style="display: none;">
-      <div class="day-agenda-header">
-        <span id="agendaDateTitle">Termine</span>
-      </div>
-      <div class="agenda-list" id="agendaList"></div>
+    <div class="controls">
+      <label class="toggle-label">
+        <input type="checkbox" id="test-mode">
+        <span>Testmodus</span>
+      </label>
+      <button class="btn-text" id="reset-btn">Neu anordnen</button>
     </div>
   </div>
 
-  <!-- Modal: Termin anlegen -->
-  <div class="modal-backdrop" id="createModal">
+  <!-- Modal / Großansicht -->
+  <div class="modal-overlay" id="modal-overlay">
     <div class="modal">
-      <div class="modal-header">
-        <h3>Neuen Termin anlegen</h3>
-      </div>
-      <form id="createEventForm">
-        <div class="form-group">
-          <label for="eventTitle">Titel</label>
-          <input type="text" id="eventTitle" required placeholder="z. B. Reitstunde oder Vorlesung">
-        </div>
-        <div class="form-group">
-          <label for="eventDate">Datum</label>
-          <input type="date" id="eventDate" required>
-        </div>
-        <div class="form-group">
-          <label for="eventTime">Uhrzeit (optional)</label>
-          <input type="time" id="eventTime">
-        </div>
-        <div class="form-group">
-          <label for="eventCategory">Kategorie</label>
-          <select id="eventCategory" required>
-            <option value="pferd">🐎 Pferd</option>
-            <option value="tage">👸 Tage</option>
-            <option value="uni">🏫 Uni</option>
-            <option value="arbeit">💼 Arbeit</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="eventNotes">Beschreibung / Notiz</label>
-          <textarea id="eventNotes" rows="2" placeholder="Zusatzinfos..."></textarea>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn" id="btnCancelCreate">Abbrechen</button>
-          <button type="submit" class="btn btn-primary">Speichern</button>
-        </div>
-      </form>
+      <div class="modal-badge" id="modal-day-badge">Tag 1</div>
+      <div class="modal-icon">🎁</div>
+      <p id="modal-content">Inhalt</p>
+      <button class="btn-primary" id="modal-close">Schließen</button>
     </div>
   </div>
 
-  <!-- Modal: Termin Details & Löschen -->
-  <div class="modal-backdrop" id="detailModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 id="detailTitle">Termindetails</h3>
-      </div>
-      <div style="font-size: 0.95rem; line-height: 1.6;">
-        <p><strong>Datum:</strong> <span id="detailDate"></span></p>
-        <p><strong>Uhrzeit:</strong> <span id="detailTime"></span></p>
-        <p><strong>Kategorie:</strong> <span id="detailCategory"></span></p>
-        <p><strong>Notiz:</strong> <span id="detailNotes"></span></p>
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-danger" id="btnDeleteEvent">Löschen</button>
-        <button type="button" class="btn" id="btnCloseDetail">Schließen</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- JavaScript einbinden -->
   <script src="script.js"></script>
 </body>
 </html>
