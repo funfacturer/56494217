@@ -15,9 +15,10 @@
   user-select: none;
 }
 
-/* Wichtig gegen weiße Ränder: HTML & Body dunkel färben und volle dynamische Höhe nutzen */
+/* Fixiert den initialen Render-Bug auf iOS und Android */
 html {
   background-color: var(--dark-blue);
+  height: -webkit-fill-available;
   height: 100%;
 }
 
@@ -25,21 +26,30 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--dark-blue);
   color: var(--text);
+  
+  /* Nutzt den maximalen echten Platz von Anfang an */
   min-height: 100vh;
-  min-height: 100dvh; /* Berücksichtigt ein-/ausblendbare Browserleisten */
+  min-height: -webkit-fill-available;
+  min-height: 100dvh;
+  
   width: 100vw;
   overflow-x: hidden;
   position: relative;
   touch-action: manipulation;
 }
 
-/* Vollflächiger Hintergrund (liegt fixiert hinter allem) */
+/* 
+  Vollflächiger Hintergrund. 
+  Nutzt 'lvh' (Large Viewport Height), um die Leisten-Verschiebungen 
+  beim ersten Laden elegant zu überspringen und weißen Rändern zuvorzukommen!
+*/
 .bg-layer {
   position: fixed;
   inset: 0;
   width: 100vw;
+  width: 100lvw;
   height: 100vh;
-  height: 100dvh;
+  height: 100lvh;
   background: 
     linear-gradient(rgba(11, 29, 58, 0.65), rgba(7, 18, 36, 0.8)),
     url('background.jpg') no-repeat center center;
@@ -55,6 +65,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  min-height: -webkit-fill-available;
   min-height: 100dvh;
   padding: env(safe-area-inset-top, 16px) 12px env(safe-area-inset-bottom, 16px) 12px;
 }
@@ -164,7 +175,7 @@ header p {
 
 /* Das Symbol auf der Rückseite des geöffneten Türchens */
 .back-symbol {
-  font-size: 1.6rem; /* Schön groß und gut erkennbar auf dem Bildschirm */
+  font-size: 1.6rem;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
 }
 
@@ -279,5 +290,5 @@ header p {
 
 @keyframes fall {
   0% { transform: translateY(0); }
-  100% { transform: translateY(105dvh); }
+  100% { transform: translateY(105lvh); }
 }
