@@ -1,3 +1,17 @@
+// Fest zugeordnete Weihnachtssymbole für jedes der 24 Türchen (Index 0 = Tag 1, Index 23 = Tag 24)
+const symbols = [
+  "🎅", "🎄", "🎁", "🦌", "⛄", "❄️", "🕯️", "🔔", 
+  "🌟", "🍪", "angel", "🛷", "🧦", "🧣", "🧤", "☕", 
+  "🍊", "🥨", "🎶", "🕊️", "⛪", "🌌", "🏠", "🍾"
+];
+
+// Die textuellen Namen der Symbole (können bei Bedarf als Hilfestellung im Rätsel dienen)
+const symbolNames = [
+  "Weihnachtsmann", "Tannenbaum", "Geschenk", "Rentier", "Schneemann", "Schneeflocke", "Kerze", "Glocke",
+  "Stern", "Keks", "Engel", "Schlitten", "Nikolausstiefel", "Schal", "Handschuhe", "Heißgetränk",
+  "Orange", "Brezel", "Noten", "Friedenstaube", "Kirche", "Sternenhimmel", "Lebkuchenhaus", "Sekt"
+];
+
 const surprises = [
   "🎄 Ein heißer Kakao wärmt heute die Seele!",
   "⭐ Glaube an Wunder, Liebe und Glück.",
@@ -96,6 +110,13 @@ function triggerHaptic() {
 
 function openModal(day) {
   modalBadge.textContent = `Türchen ${day}`;
+  
+  // Setze das zugehörige Symbol ins Modal
+  const modalIconElement = document.querySelector(".modal-icon");
+  if (modalIconElement) {
+    modalIconElement.textContent = symbols[day - 1];
+  }
+  
   modalContent.textContent = surprises[day - 1];
   modalOverlay.style.display = "flex";
   document.body.classList.add("modal-open");
@@ -133,9 +154,10 @@ function createCalendar() {
     front.className = "door-front";
     front.innerHTML = `<span class="number">${day}</span><span class="star">★</span>`;
 
+    // Das Symbol wird fest auf der Rückseite des Türchens platziert
     const back = document.createElement("div");
     back.className = "door-back";
-    back.innerHTML = `<span>✓</span>`;
+    back.innerHTML = `<span class="back-symbol">${symbols[day - 1]}</span>`;
 
     card.appendChild(front);
     card.appendChild(back);
