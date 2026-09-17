@@ -5,6 +5,8 @@
   --door-back: #1b4d3e;
   --text: #ffffff;
   --dark-blue: #0b1d3a;
+  /* Fallback-Höhe, falls JS noch nicht geladen hat */
+  --app-height: 100vh; 
 }
 
 * {
@@ -15,35 +17,35 @@
   user-select: none;
 }
 
-/* 
-  1. HTML & Body werden starr fixiert (kein elastisches Bouncen/Scrollen).
-  Dadurch kann sich das Hintergrundbild niemals nach oben wegschieben!
-*/
-html, body {
+/* Wichtig gegen weiße/blaue Ränder */
+html {
   background-color: var(--dark-blue);
-  height: 100vh;
-  height: -webkit-fill-available;
-  height: 100dvh;
-  width: 100vw;
-  overflow: hidden; /* Verhindert das Scrollen des nackten Bodys */
-  position: relative;
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--dark-blue);
   color: var(--text);
+  
+  /* Exakt berechnete Höhe, um den Balken unten komplett zu verhindern */
+  height: var(--app-height);
+  width: 100vw;
+  overflow: hidden;
+  position: relative;
   touch-action: manipulation;
 }
 
 /* 
-  2. Der fixierte Hintergrund dehnt sich dank absolute und inset: 0
-  störungsfrei über das starr fixierte Body-Element aus.
+  Fixiertes Hintergrundbild nutzt nun die exakt berechnete 
+  Pixelhöhe des Bildschirms!
 */
 .bg-layer {
   position: absolute;
   inset: 0;
   width: 100%;
-  height: 100%;
+  height: var(--app-height);
   background: 
     linear-gradient(rgba(11, 29, 58, 0.65), rgba(7, 18, 36, 0.8)),
     url('background.jpg') no-repeat center center;
@@ -52,20 +54,16 @@ body {
   pointer-events: none;
 }
 
-/* 
-  3. Der App-Wrapper übernimmt jetzt das Scrollen!
-  Er verhält sich nach außen hin wie eine eigene Scroll-Box, fängt alle 
-  Touch-Gesten ab und verhindert so, dass der Browser-Hintergrund aufblitzt.
-*/
+/* Haupt-Container mit Scrollbereich */
 .app-wrapper {
   position: absolute;
   inset: 0;
   z-index: 2;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  overflow-y: auto; /* Scrollen findet nur hier drinnen statt */
-  -webkit-overflow-scrolling: touch; /* Flüssiges Trägheitsscrollen auf iPhones */
+  height: var(--app-height);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: env(safe-area-inset-top, 16px) 12px env(safe-area-inset-bottom, 16px) 12px;
 }
 

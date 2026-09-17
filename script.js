@@ -219,3 +219,18 @@ function createSnow() {
 
 createSnow();
 createCalendar();
+
+// Funktion, um die exakte Höhe des mobilen Displays in Pixeln zu ermitteln
+function adjustAppHeight() {
+  const doc = document.documentElement;
+  // Berechnet die exakt nutzbare Höhe des Fensters in Pixeln
+  doc.style.setProperty('--app-height', `${window.innerHeight}px`);
+}
+
+// Sofort beim Laden ausführen
+adjustAppHeight();
+
+// Bei Drehung des Bildschirms oder Größenänderung neu berechnen
+window.addEventListener('resize', adjustAppHeight);
+window.addEventListener('orientationchange', adjustAppHeight);
+
