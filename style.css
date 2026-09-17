@@ -17,17 +17,32 @@
 }
 
 /* 
-  1. TRICK: Wir legen das Hintergrundbild direkt auf das HTML-Element.
-  Egal, welche Leiste sich wie verschiebt oder abschneidet – es gibt 
-  keine Ebene darunter, die durchscheinen kann.
+  1. HTML-ELEMENT ALS RETTER:
+  Wir färben den nackten HTML-Hintergrund dunkel ein und legen das Bild
+  über ein ::before-Element fest, das wir am unteren Rand 100 Pixel ZUSÄTZLICH
+  überdehnen. So fängt das Bild jeden Berechnungsfehler des Browsers ab!
 */
 html {
-  background: 
-    linear-gradient(rgba(11, 29, 58, 0.65), rgba(7, 18, 36, 0.8)),
-    url('background.jpg') no-repeat center center fixed;
-  background-size: cover;
+  background-color: var(--dark-blue);
   height: 100%;
   overflow: hidden;
+  position: relative;
+}
+
+html::before {
+  content: "";
+  position: absolute;
+  /* Überdehnung nach unten gegen den weissen Balken */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: -100px; 
+  background: 
+    linear-gradient(rgba(11, 29, 58, 0.65), rgba(7, 18, 36, 0.8)),
+    url('background.jpg') no-repeat center center;
+  background-size: cover;
+  z-index: -1;
+  pointer-events: none;
 }
 
 body {
@@ -40,17 +55,12 @@ body {
   overflow: hidden;
   position: relative;
   touch-action: manipulation;
-  background: transparent; /* Transparent, damit HTML-Hintergrund sichtbar ist */
+  background: transparent; /* Verhindert, dass der Body das HTML-Bild verdeckt */
 }
 
 /* 
-  Der separate .bg-layer wird nicht mehr benötigt und wurde entfernt, 
-  da das Bild nun direkt im HTML-Tag verankert ist!
-*/
-
-/* 
-  2. Der App-Wrapper steht jetzt im normalen Fluss (nicht mehr absolut).
-  So umgehen wir den WebKit-Clipping-Bug an der Unterkante komplett.
+  2. Scroll-Container:
+  Der Wrapper fängt alle Wischgesten ab und bleibt starr im Viewport verankert.
 */
 .app-wrapper {
   position: relative;
