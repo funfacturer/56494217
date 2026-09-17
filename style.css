@@ -5,8 +5,7 @@
   --door-back: #1b4d3e;
   --text: #ffffff;
   --dark-blue: #0b1d3a;
-  /* Fallback-Höhe, falls JS noch nicht geladen hat */
-  --app-height: 100vh; 
+  --app-height: 100vh;
 }
 
 * {
@@ -17,58 +16,56 @@
   user-select: none;
 }
 
-/* Wichtig gegen weiße/blaue Ränder */
+/* 
+  1. TRICK: Wir legen das Hintergrundbild direkt auf das HTML-Element.
+  Egal, welche Leiste sich wie verschiebt oder abschneidet – es gibt 
+  keine Ebene darunter, die durchscheinen kann.
+*/
 html {
-  background-color: var(--dark-blue);
+  background: 
+    linear-gradient(rgba(11, 29, 58, 0.65), rgba(7, 18, 36, 0.8)),
+    url('background.jpg') no-repeat center center fixed;
+  background-size: cover;
   height: 100%;
   overflow: hidden;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background-color: var(--dark-blue);
   color: var(--text);
   
-  /* Exakt berechnete Höhe, um den Balken unten komplett zu verhindern */
+  /* Nutzt die exakt via JS berechnete Höhe */
   height: var(--app-height);
   width: 100vw;
   overflow: hidden;
   position: relative;
   touch-action: manipulation;
+  background: transparent; /* Transparent, damit HTML-Hintergrund sichtbar ist */
 }
 
 /* 
-  Fixiertes Hintergrundbild nutzt nun die exakt berechnete 
-  Pixelhöhe des Bildschirms!
+  Der separate .bg-layer wird nicht mehr benötigt und wurde entfernt, 
+  da das Bild nun direkt im HTML-Tag verankert ist!
 */
-.bg-layer {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: var(--app-height);
-  background: 
-    linear-gradient(rgba(11, 29, 58, 0.65), rgba(7, 18, 36, 0.8)),
-    url('background.jpg') no-repeat center center;
-  background-size: cover;
-  z-index: 0;
-  pointer-events: none;
-}
 
-/* Haupt-Container mit Scrollbereich */
+/* 
+  2. Der App-Wrapper steht jetzt im normalen Fluss (nicht mehr absolut).
+  So umgehen wir den WebKit-Clipping-Bug an der Unterkante komplett.
+*/
 .app-wrapper {
-  position: absolute;
-  inset: 0;
+  position: relative;
   z-index: 2;
   display: flex;
   flex-direction: column;
-  height: var(--app-height);
+  width: 100%;
+  height: 100%;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: env(safe-area-inset-top, 16px) 12px env(safe-area-inset-bottom, 16px) 12px;
 }
 
 body.modal-open .app-wrapper {
-  overflow: hidden; /* Verhindert das Scrollen im Hintergrund bei geöffnetem Modal */
+  overflow: hidden;
 }
 
 /* Header */
