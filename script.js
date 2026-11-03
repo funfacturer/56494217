@@ -1,42 +1,63 @@
 // Fest zugeordnete Weihnachtssymbole für jedes der 24 Türchen (Index 0 = Tag 1, Index 23 = Tag 24)
 const symbols = [
-  "🎅", "🎄", "🎁", "🦌", "⛄", "❄️", "🕯️", "🔔", 
-  "🌟", "🍪", "angel", "🛷", "🧦", "🧣", "🧤", "☕", 
-  "🍊", "🥨", "🎶", "🕊️", "⛪", "🌌", "🏠", "🍾"
+  "🎅", // Tag 1
+  "🎄", // Tag 2
+  "🎁", // Tag 3
+  "🦌", // Tag 4
+  "⛄", // Tag 5
+  "❄️", // Tag 6
+  "🕯️", // Tag 7
+  "🔔", // Tag 8
+  "🌟", // Tag 9
+  "🍪", // Tag 10
+  "👼", // Tag 11
+  "🛷", // Tag 12
+  "🧦", // Tag 13
+  "🧣", // Tag 14
+  "🧤", // Tag 15
+  "☕", // Tag 16
+  "🍊", // Tag 17
+  "🥨", // Tag 18
+  "🎶", // Tag 19
+  "🕊️", // Tag 20
+  "⛪", // Tag 21
+  "🏠", // Tag 22
+  "🍾", // Tag 23
+  "🧸"  // Tag 24
 ];
 
 // Die textuellen Namen der Symbole (können bei Bedarf als Hilfestellung im Rätsel dienen)
 const symbolNames = [
   "Weihnachtsmann", "Tannenbaum", "Geschenk", "Rentier", "Schneemann", "Schneeflocke", "Kerze", "Glocke",
   "Stern", "Keks", "Engel", "Schlitten", "Nikolausstiefel", "Schal", "Handschuhe", "Heißgetränk",
-  "Orange", "Brezel", "Noten", "Friedenstaube", "Kirche", "Sternenhimmel", "Lebkuchenhaus", "Sekt"
+  "Orange", "Brezel", "Noten", "Friedenstaube", "Kirche", "Lebkuchenhaus", "Sekt", "Teddybär"
 ];
 
 const surprises = [
-  "🎄 Ein heißer Kakao wärmt heute die Seele!",
-  "⭐ Glaube an Wunder, Liebe und Glück.",
-  "🕯️ Zünde heute eine Kerze für Gemütlichkeit an.",
-  "🍪 Zeit, Plätzchen zu naschen oder zu backen!",
-  "❄️ Atme tief ein und genieße die Winterluft.",
-  "🎅 Frohen Nikolaustag! Schau in deine Schuhe.",
-  "🎶 Höre heute dein liebstes Weihnachtslied.",
-  "🎁 Schicke jemandem eine nette Sprachnachricht.",
-  "📖 Gönne dir heute 15 Minuten Lesezeit.",
-  "🍵 Genieße einen wärmenden Gewürztee.",
-  "✨ Schenke heute einem Fremden ein Lächeln.",
-  "🍊 Duft von Zimt und Mandarinen genießen.",
-  "💌 Zeit für die ersten Weihnachtsgrüße.",
-  "🌟 Schau heute Abend kurz in den Sternenhimmel.",
-  "🎬 Zeit für einen gemütlichen Weihnachtsfilm.",
-  "🥨 Gönne dir heute eine süße Leckerei.",
-  "🧣 Kuschel dich warm ein.",
-  "🌨️ Nimm dir heute eine kleine Auszeit.",
-  "🕯️ Das Fest rückt immer näher!",
-  "🎉 Erinnere dich an einen schönen Moment des Jahres.",
-  "🕊️ Ruhe und Gelassenheit für den Tag.",
-  "🎵 Mach die Weihnachtsmusik an!",
-  "🌲 Morgen ist Heiligabend!",
-  "🎅 Frohe und gesegnete Weihnachten!"
+  "🎅 Ein heißer Kakao wärmt heute die Seele!",
+  "🎄 Glaube an Wunder, Liebe und Glück.",
+  "🎁 Zünde heute eine Kerze für Gemütlichkeit an.",
+  "🦌 Zeit, Plätzchen zu naschen oder zu backen!",
+  "⛄ Atme tief ein und genieße die Winterluft.",
+  "❄️ Frohen Nikolaustag! Schau in deine Schuhe.",
+  "🕯️ Höre heute dein liebstes Weihnachtslied.",
+  "🔔 Schicke jemandem eine nette Sprachnachricht.",
+  "🌟 Gönne dir heute 15 Minuten Lesezeit.",
+  "🍪 Genieße einen wärmenden Gewürztee.",
+  "👼 Schenke heute einem Fremden ein Lächeln.",
+  "🛷 Duft von Zimt und Mandarinen genießen.",
+  "🧦 Zeit für die ersten Weihnachtsgrüße.",
+  "🧣 Schau heute Abend kurz in den Sternenhimmel.",
+  "🧤 Zeit für einen gemütlichen Weihnachtsfilm.",
+  "☕ Gönne dir heute eine süße Leckerei.",
+  "🍊 Kuschel dich warm ein.",
+  "🥨 Nimm dir heute eine kleine Auszeit.",
+  "🎶 Das Fest rückt immer näher!",
+  "🕊️ Erinnere dich an einen schönen Moment des Jahres.",
+  "⛪ Ruhe und Gelassenheit für den Tag.",
+  "🏠 Mach die Weihnachtsmusik an!",
+  "🍾 Morgen ist Heiligabend!",
+  "🧸 Frohe und gesegnete Weihnachten!"
 ];
 
 const calendar = document.getElementById("calendar");

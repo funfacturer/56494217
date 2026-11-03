@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 10mm;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      color: #000000;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+    .symbol-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      gap: 15px;
+      width: 100%;
+      max-width: 1000px;
+      margin: auto;
+    }
+    .symbol-card {
+      aspect-ratio: 1 / 1;
+      border: 1px dashed #aaaaaa;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 5rem; /* Optimale Größe für die Symbole */
+      background-color: #ffffff;
+      position: relative;
+    }
+    .number-hint {
+      position: absolute;
+      bottom: 8px;
+      font-size: 0.75rem;
+      color: #888888;
+      width: 100%;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="symbol-grid">
+    <div class="symbol-card">🎅</div>
+    <div class="symbol-card">🎄</div>
+    <div class="symbol-card">🎁</div>
+    <div class="symbol-card">🦌</div>
+    <div class="symbol-card">⛄</div>
+    <div class="symbol-card">❄️</div>
+    <div class="symbol-card">🕯️</div>
+    <div class="symbol-card">🔔</div>
+    <div class="symbol-card">🌟</div>
+    <div class="symbol-card">🍪</div>
+    <div class="symbol-card">👼</div>
+    <div class="symbol-card">🛷</div>
+    <div class="symbol-card">🧦</div>
+    <div class="symbol-card">🧣</div>
+    <div class="symbol-card">🧤</div>
+    <div class="symbol-card">☕</div>
+    <div class="symbol-card">🍊</div>
+    <div class="symbol-card">🥨</div>
+    <div class="symbol-card">🎶</div>
+    <div class="symbol-card">🕊️</div>
+    <div class="symbol-card">⛪</div>
+    <div class="symbol-card">🏠</div>
+    <div class="symbol-card">🍾</div>
+    <div class="symbol-card">🧸</div>
+  </div>
+
+</body>
+</html>
