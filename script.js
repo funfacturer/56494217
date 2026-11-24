@@ -1,38 +1,19 @@
-// Fest zugeordnete Weihnachtssymbole für jedes der 24 Türchen (Index 0 = Tag 1, Index 23 = Tag 24)
+// Fest zugeordnete, absolut einzigartige Weihnachtssymbole für jedes der 24 Türchen
+// (Perfekt geeignet als Aufkleber für deinen echten Holzkalender!)
 const symbols = [
-  "🎅", // Tag 1
-  "🎄", // Tag 2
-  "🎁", // Tag 3
-  "🦌", // Tag 4
-  "⛄", // Tag 5
-  "❄️", // Tag 6
-  "🕯️", // Tag 7
-  "🔔", // Tag 8
-  "🌟", // Tag 9
-  "🍪", // Tag 10
-  "👼", // Tag 11
-  "🛷", // Tag 12
-  "🧦", // Tag 13
-  "🧣", // Tag 14
-  "🧤", // Tag 15
-  "☕", // Tag 16
-  "🍊", // Tag 17
-  "🥨", // Tag 18
-  "🎶", // Tag 19
-  "🕊️", // Tag 20
-  "⛪", // Tag 21
-  "🏠", // Tag 22
-  "🍾", // Tag 23
-  "🧸"  // Tag 24
+  "🎅", "🎄", "🎁", "🦌", "⛄", "❄️", "🕯️", "🔔", 
+  "🌟", "🍪", "👼", "🛷", "🧦", "🧣", "🧤", "☕", 
+  "🍊", "🥨", "🎶", "🕊️", "⛪", "🏠", "🍾", "🧸"
 ];
 
-// Die textuellen Namen der Symbole (können bei Bedarf als Hilfestellung im Rätsel dienen)
+// Die passenden Namen dazu (für deinen Lösungsbogen oder dein Rätsel)
 const symbolNames = [
   "Weihnachtsmann", "Tannenbaum", "Geschenk", "Rentier", "Schneemann", "Schneeflocke", "Kerze", "Glocke",
   "Stern", "Keks", "Engel", "Schlitten", "Nikolausstiefel", "Schal", "Handschuhe", "Heißgetränk",
   "Orange", "Brezel", "Noten", "Friedenstaube", "Kirche", "Lebkuchenhaus", "Sekt", "Teddybär"
 ];
 
+// Deine originalen Sprüche – Symbole am Anfang wurden an die Aufkleber angepasst!
 const surprises = [
   "🎅 Ein heißer Kakao wärmt heute die Seele!",
   "🎄 Glaube an Wunder, Liebe und Glück.",
@@ -61,7 +42,6 @@ const surprises = [
 ];
 
 const calendar = document.getElementById("calendar");
-const testModeCheckbox = document.getElementById("test-mode");
 const resetBtn = document.getElementById("reset-btn");
 const modalOverlay = document.getElementById("modal-overlay");
 const modalBadge = document.getElementById("modal-day-badge");
@@ -97,9 +77,9 @@ function generateRandomLayout() {
       const cellTop = (r / rows) * 100;
       const cellLeft = (c / cols) * 100;
 
-      // Zufallsversatz innerhalb der Zelle
-      const jitterTop = (Math.random() * 4) + 1; // 1% bis 5%
-      const jitterLeft = (Math.random() * 6) + 2; // 2% bis 8%
+      // Perfekt abgestimmter Zufallsversatz (verhindert das Rutschen über den Bildschirmrand hinaus)
+      const jitterTop = (Math.random() * 3) + 1; // 1% bis 4%
+      const jitterLeft = (Math.random() * 4) + 1; // 1% bis 5%
       const rotation = (Math.random() * 20) - 10; // -10deg bis +10deg
 
       positions.push({
@@ -186,8 +166,10 @@ function createCalendar() {
 
     container.addEventListener("click", () => {
       triggerHaptic();
+      
+      // Echte Kalender-Logik: Nur im Dezember (Monat 11) und nur bis zum aktuellen Tag freischalten
       const isDecember = currentMonth === 11;
-      const isAllowed = testModeCheckbox.checked || (isDecember && currentDay >= day);
+      const isAllowed = isDecember && currentDay >= day;
 
       if (!isAllowed) {
         alert(`Türchen ${day} öffnet sich erst am ${day}. Dezember! 🎅`);
@@ -238,20 +220,21 @@ function createSnow() {
   }
 }
 
-createSnow();
-createCalendar();
-
 // Funktion, um die exakte Höhe des mobilen Displays in Pixeln zu ermitteln
 function adjustAppHeight() {
   const doc = document.documentElement;
-  // Berechnet die exakt nutzbare Höhe des Fensters in Pixeln
   doc.style.setProperty('--app-height', `${window.innerHeight}px`);
 }
 
-// Sofort beim Laden ausführen
+// Höhenberechnung ausführen bevor der Kalender gerendert wird
 adjustAppHeight();
+createSnow();
+createCalendar();
 
 // Bei Drehung des Bildschirms oder Größenänderung neu berechnen
-window.addEventListener('resize', adjustAppHeight);
-window.addEventListener('orientationchange', adjustAppHeight);
-
+window.addEventListener('resize', () => {
+  adjustAppHeight();
+});
+window.addEventListener('orientationchange', () => {
+  adjustAppHeight();
+});
