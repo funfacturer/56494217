@@ -42,7 +42,6 @@ const surprises = [
 ];
 
 const calendar = document.getElementById("calendar");
-const resetBtn = document.getElementById("reset-btn");
 const modalOverlay = document.getElementById("modal-overlay");
 const modalBadge = document.getElementById("modal-day-badge");
 const modalContent = document.getElementById("modal-content");
@@ -192,15 +191,6 @@ function createCalendar() {
 modalClose.addEventListener("click", closeModal);
 modalOverlay.addEventListener("click", (e) => {
   if (e.target === modalOverlay) closeModal();
-});
-
-resetBtn.addEventListener("click", () => {
-  if (confirm("Kalender zurücksetzen und Türchen neu im Bild verteilen?")) {
-    openedDoors = [];
-    localStorage.removeItem("advent_opened_doors");
-    localStorage.removeItem("advent_positions");
-    createCalendar();
-  }
 });
 
 // Schneefall
